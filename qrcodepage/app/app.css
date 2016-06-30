@@ -1,0 +1,15 @@
+body {
+  padding-top: 50px;
+  font-family: Arial, 'Times New Roman', 'Microsoft YaHei', SimHei;
+}
+
+.starter-template {
+  padding: 40px 15px;
+  text-align: center;
+}
+
+.elip {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
