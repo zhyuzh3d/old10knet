@@ -1,0 +1,50 @@
+<!--优惠券列表的页面框架-->
+
+<div id='ticketlist' ng-controller='ticketlist' class='container-fluid'>
+  <!--补充的css样式，都以控制器开头-->
+  <style>
+    .ticketlist-temp {
+      font-weight: bold;
+    }
+
+    .list-group li {
+      font-size: 12px;
+      height: 36px;
+      padding: 10px;
+    }
+  </style>
+
+  <!--控制器html界面部分-->
+  <div class='col-xs-12 col-sm-12 col-md-10 col-lg-8 col-md-offset-1 col-lg-offset-2'>
+
+    <!--    按钮-->
+    <div class="btn btn-success" ng-click='addticket()'>添加优惠券</div>
+
+    <!--    优惠券列表-->
+    <div style="margin-top:15px">
+      <div class="panel panel-default" ng-repeat='ticket in tickets' style="margin-top:12px;margin-bottom:12px">
+
+        <!--        优惠券标题-->
+        <div class="panel-heading" style="height:40px">
+          <div class='col-xs-10'>
+            <span ng-bind='ticket.key' class='elip'> 页面值 </span>
+          </div>
+          <div class="col-xs-2" style=" text-align:right;cursor:pointer">
+            <span class="fa fa-remove" ng-click='removeticket(ticket.key)'></span>
+          </div>
+        </div>
+        <div class="panel-body elip">
+          <span ng-bind='ticket.url' class="elip"> 页面url </span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!--  end-->
+</div>
+
+<!--加载外部控制器js文件-->
+<script>
+  $.addCtrlrJs('ticketlist');
+</script>

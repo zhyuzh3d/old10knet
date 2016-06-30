@@ -1,0 +1,64 @@
+<!--商家列表的页面框架-->
+
+<div id='malllist' ng-controller='malllist' class='container-fluid'>
+  <!--补充的css样式，都以控制器开头-->
+  <style>
+    .malllist-temp {
+      font-weight: bold;
+    }
+
+    .list-group li {
+      font-size: 12px;
+      height: 36px;
+    }
+  </style>
+
+  <!--控制器html界面部分-->
+  <div class='col-xs-12 col-sm-12 col-md-10 col-lg-8 col-md-offset-1 col-lg-offset-2'>
+
+    <!--    按钮-->
+    <div class="btn btn-success" ng-click='addmall()'>添加商家</div>
+
+    <!--    商场列表-->
+    <div style="margin-top:15px">
+      <div class="panel panel-default" ng-repeat='mall in malls' style="margin-top:12px;margin-bottom:12px">
+
+        <!--        商场标题-->
+        <div class="panel-heading" style="height:40px">
+          <div class='col-xs-10' ng-bind='mall.name'>未命名商场</div>
+          <div class="col-xs-2" style=" text-align:right;cursor:pointer">
+            <span class="fa fa-remove" ng-click='removemall(mall.key)'></span>
+          </div>
+        </div>
+
+        <div class='panel-body'>
+          <div class="btn btn-warning btn-sm" ng-click='addticket(mall.key)'>添加优惠券</div>
+        </div>
+
+        <!--        优惠券列表-->
+        <ul class="list-group">
+          <li class="list-group-item" ng-repeat='ticket in mall.tickets'>
+            <div class='col-xs-10 elip'>
+              <span ng-bind='ticket.key'>key</span>
+            </div>
+            <div class="col-xs-2" style=" text-align:right;cursor:pointer">
+              <span class="fa fa-remove" ng-click='removeticket(mall.key,ticket.key)'></span>
+            </div>
+          </li>
+        </ul>
+
+      </div>
+    </div>
+
+
+
+
+  </div>
+
+  <!--  end-->
+</div>
+
+<!--加载外部控制器js文件-->
+<script>
+  $.addCtrlrJs('malllist');
+</script>

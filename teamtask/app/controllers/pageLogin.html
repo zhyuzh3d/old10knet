@@ -1,0 +1,129 @@
+<!--登录注册页框架-->
+
+<!--控制器界面部分-->
+<div id='pageLogin' ng-controller='pageLogin' class='container-fluid'>
+
+    <!--补充的css样式，都以控制器开头-->
+    <style>
+        .pageLogin-temp {
+            font-weight: bold;
+        }
+    </style>
+
+    <!--html界面-->
+    <div class='col-xs-10 col-sm-8 col-md-6 col-xs-offset-1 col-sm-offset-2 col-md-offset-3' style='margin-top:4em'>
+        <div class="form-group">
+            <label for="exampleInputEmail1">账号</label>
+            <input type="email" class="form-control" id="exampleInputEmail1" placeholder="Email" ng-model="email" required>
+        </div>
+        <div class="form-group">
+            <label for="exampleInputPassword1">密码</label>
+            <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password" ng-model='pw' ng-minlength=4 required>
+        </div>
+        <button type="submit" class="btn btn-primary" ng-click='login()'>登陆</button>
+        <button type="submit" class="btn btn-success" ng-click='register()'>注册</button>
+    </div>
+</div>
+
+
+<!--控制器代码部分-->
+<script>
+    (function() {
+        angular.module('app').controller('pageLogin', ['$rootScope', '$scope', fn]);
+
+        function fn($rootScope, $scope) {
+            $rootScope['pageLogin'] = $scope;
+
+            //需要载入的内容，仅限延迟使用，即时使用的需要加入index.html
+            _cfg.load('swal');
+            _cfg.load('toastr');
+            _cfg.load('md5');
+
+            //检查登录信息，登陆成功自动跳转
+            $scope.getAuth = function() {
+                var ref = new Wilddog("https://teamtask.wilddogio.com");
+                var authData = ref.getAuth();
+                if (authData) {
+                    $rootScope.xdat.authData = authData;
+                    $rootScope.topNavbar.changePage(1);
+                    $rootScope.topNavbar.$apply();
+                };
+            };
+
+            //发送登陆信息
+            $scope.login = function() {
+                if (!$scope.email || !$scope.pw) {
+                    swal('格式错误');
+                } else {
+                    var ref = new Wilddog("https://teamtask.wilddogio.com");
+
+                    // 或者使用email/password认证方式。
+                    ref.authWithPassword({
+                        email: $scope.email,
+                        password: $scope.pw,
+                    }, function(error, authData) {
+                        if (error) {
+                            swal('登陆失败', error, 'error');
+                        } else {
+                            $rootScope.xdat.authData = authData;
+                            $rootScope.topNavbar.changePage(1);
+                            $rootScope.topNavbar.$apply();
+                        };
+                    });
+                }
+            };
+
+            //注册一个邮箱用户，创建users/uid
+            $scope.register = function() {
+                if (!$scope.email || !$scope.pw) {
+                    swal('格式错误');
+                } else {
+                    var ref = new Wilddog("https://teamtask.wilddogio.com");
+
+                    ref.createUser({
+                        email: $scope.email,
+                        password: $scope.pw,
+                    }, function(err, data) {
+                        if (err != null) {
+                            swal('注册失败:' + err);
+                        } else {
+                            //创建users
+                            var ref = new Wilddog("https://teamtask.wilddogio.com/users");
+                            var dt = {};
+                            var uid = data.uid;
+                            dt[uid] = {
+                                email: $scope.email,
+                                nick: $scope.email.replace(/@.*$/g, ''),
+                                uid: uid,
+                            };
+                            ref.update(dt);
+
+                            //创建邮箱md5到uid的索引
+                            var ref2 = new Wilddog("https://teamtask.wilddogio.com/umail2uid");
+                            var dt2 = {};
+                            dt2[md5($scope.email)] = uid;
+                            ref2.update(dt2);
+                            //自动登陆
+                            $scope.login();
+                        };
+                    })
+                };
+            };
+
+        };
+      var a='333sds@sdds.com';
+      console.log(a.toString(64));
+
+    })();
+</script>
+
+
+
+
+
+
+
+
+
+
+<!---->

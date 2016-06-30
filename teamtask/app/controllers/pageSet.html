@@ -1,0 +1,89 @@
+<!--团队任务页面框架-->
+
+<!--需要的js或css库文件-->
+
+<!--控制器界面部分-->
+<div id='pageTask' ng-controller='pageTask' class='container-fluid'>
+
+    <!--补充的css样式，都以控制器开头-->
+    <style>
+        .pageTask-temp {
+            font-weight: bold;
+        }
+    </style>
+
+    <!--html界面-->
+    <div class='col-xs-10 col-sm-10 col-md-10 col-lg-8 col-xs-offset-1 col-sm-offset-1 col-md-offset-1 col-lg-offset-2' style='margin-top:2em'>
+        <div class="form-group">
+            <label for="inputEmail3" class="col-sm-2 control-label">nick</label>
+            <div class="col-sm-5">
+                <input type="text" class="form-control" placeholder="nick" ng-model='nick'>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10" style="margin-top:1em">
+                <button type="submit" class="btn btn-primary" style="width:10em" ng-click='saveSet()'>save</button>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+<!--控制器代码部分-->
+<script>
+    (function() {
+        angular.module('app').controller('pageTask', ['$rootScope', '$scope', fn]);
+
+        function fn($rootScope, $scope) {
+            $rootScope['pageTask'] = $scope;
+
+            //载入外部依赖
+            _cfg.load('swal');
+            _cfg.load('toastr');
+
+            //如果未登录自动跳到登陆
+            var xdat = $rootScope.xdat;
+            if (!xdat.authData) {
+                $rootScope.topNavbar.changePage(0);
+                return;
+            };
+
+            //更新设置数据
+            $scope.getSet = function() {
+                var ref = new Wilddog("https://teamtask.wilddogio.com/users/" + xdat.authData.uid + '/nick');
+                ref.on("value", function(snapshot, err) {
+                    $scope.nick = snapshot.val();
+                    _fns.applyScope($scope);
+                }, function(errorObject) {
+                    toastr.info('获取用户昵称失败:' + errorObject);
+                });
+            };
+            $scope.getSet();
+
+            //切换页面
+            $scope.saveSet = function() {
+                var ref = new Wilddog("https://teamtask.wilddogio.com");
+                var dt = {};
+                var uid = xdat.authData.uid;
+                dt[uid] = {
+                    nick: $scope.nick
+                };
+                var tasks = ref.child("users");
+                var newtask = tasks.set(dt);
+            };
+        };
+
+    })();
+</script>
+
+
+
+
+
+
+
+
+
+
+<!---->
