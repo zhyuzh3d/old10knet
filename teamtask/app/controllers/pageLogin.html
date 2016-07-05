@@ -26,96 +26,11 @@
 </div>
 
 
-<!--控制器代码部分-->
+<!--加载外部控制器js文件-->
 <script>
-    (function() {
-        angular.module('app').controller('pageLogin', ['$rootScope', '$scope', fn]);
-
-        function fn($rootScope, $scope) {
-            $rootScope['pageLogin'] = $scope;
-
-            //需要载入的内容，仅限延迟使用，即时使用的需要加入index.html
-            _cfg.load('swal');
-            _cfg.load('toastr');
-            _cfg.load('md5');
-
-            //检查登录信息，登陆成功自动跳转
-            $scope.getAuth = function() {
-                var ref = new Wilddog("https://teamtask.wilddogio.com");
-                var authData = ref.getAuth();
-                if (authData) {
-                    $rootScope.xdat.authData = authData;
-                    $rootScope.topNavbar.changePage(1);
-                    $rootScope.topNavbar.$apply();
-                };
-            };
-
-            //发送登陆信息
-            $scope.login = function() {
-                if (!$scope.email || !$scope.pw) {
-                    swal('格式错误');
-                } else {
-                    var ref = new Wilddog("https://teamtask.wilddogio.com");
-
-                    // 或者使用email/password认证方式。
-                    ref.authWithPassword({
-                        email: $scope.email,
-                        password: $scope.pw,
-                    }, function(error, authData) {
-                        if (error) {
-                            swal('登陆失败', error, 'error');
-                        } else {
-                            $rootScope.xdat.authData = authData;
-                            $rootScope.topNavbar.changePage(1);
-                            $rootScope.topNavbar.$apply();
-                        };
-                    });
-                }
-            };
-
-            //注册一个邮箱用户，创建users/uid
-            $scope.register = function() {
-                if (!$scope.email || !$scope.pw) {
-                    swal('格式错误');
-                } else {
-                    var ref = new Wilddog("https://teamtask.wilddogio.com");
-
-                    ref.createUser({
-                        email: $scope.email,
-                        password: $scope.pw,
-                    }, function(err, data) {
-                        if (err != null) {
-                            swal('注册失败:' + err);
-                        } else {
-                            //创建users
-                            var ref = new Wilddog("https://teamtask.wilddogio.com/users");
-                            var dt = {};
-                            var uid = data.uid;
-                            dt[uid] = {
-                                email: $scope.email,
-                                nick: $scope.email.replace(/@.*$/g, ''),
-                                uid: uid,
-                            };
-                            ref.update(dt);
-
-                            //创建邮箱md5到uid的索引
-                            var ref2 = new Wilddog("https://teamtask.wilddogio.com/umail2uid");
-                            var dt2 = {};
-                            dt2[md5($scope.email)] = uid;
-                            ref2.update(dt2);
-                            //自动登陆
-                            $scope.login();
-                        };
-                    })
-                };
-            };
-
-        };
-      var a='333sds@sdds.com';
-      console.log(a.toString(64));
-
-    })();
+    _fns.addCtrlrJs('pageLogin');
 </script>
+
 
 
 

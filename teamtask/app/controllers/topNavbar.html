@@ -8,6 +8,15 @@
         .topNavbar-menu {
             padding: 15px 3em
         }
+
+        #navBox .dropdown-menu li {
+            padding: 12px;
+            text-align: center;
+        }
+
+        #navBox .dropdown-menu .act {
+            background: #EEE;
+        }
     </style>
 
     <!--顶部导航栏-->
@@ -25,55 +34,39 @@
                 </div>
                 <div id="navbar" class="collapse navbar-collapse">
                     <ul class="nav navbar-nav">
-                        <li ng-class="{true:'active',false:''}[activeMenu==0]" ng-click='changePage(0)'>
-                            <a href="#" style="padding: 15px 2em">登陆注册</a>
+                        <li ng-class="{true:'active',false:''}[curPage=='pageTeams']" ng-click='changePage("pageTeams")'>
+                            <a href="#" style="padding: 15px 2em">我的团队</a>
                         </li>
-                        <li ng-class="{true:'active',false:''}[activeMenu==1]" ng-click='changePage(1)'>
+                        <li ng-class="{true:'active',false:''}[curPage=='pageTasks']" ng-click='changePage("pageTasks")'>
                             <a href="#" style="padding: 15px 2em">我的任务</a>
                         </li>
-                        <li ng-class="{true:'active',false:''}[activeMenu==2]" ng-click='changePage(2)'>
-                            <a href="#" style="padding: 15px 2em">成就统计</a>
-                        </li>
                     </ul>
-                    <ul class="nav navbar-nav navbar-right" ng-click='changePage(3)'>
-                        <li ng-class="{true:'active',false:''}[activeMenu==3]"><a href="#">设置</a>
+
+                    <ul class="nav navbar-nav navbar-right">
+                        <li class="btn-group">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                                <span ng-bind='$root.xdat.authData.user.nick || "未命名"'>用户名</span>
+                                <span class="caret"></span></a>
+                            <ul class="dropdown-menu" style="padding:0;overflow:hidden">
+                                <li ng-class="{true:'act',false:''}[curPage=='pageSet']" ng-click='changePage("pageSet")'><a href="#">个人设置</a></li>
+                                <li ng-class="{true:'act',false:''}[curPage=='pageLogin']" ng-click='changePage("pageLogin")'><a href="#">登录注册</a></li>
+                            </ul>
                         </li>
                     </ul>
                 </div>
             </div>
         </nav>
     </div>
-
+    <!--切换页面-->
     <div id='pageBox' class='container-fluid'>
-        <div ng-include='curpage'></div>
+        <div  id='pageCtrlr' ng-include='curPageUrl' redirCtrlr='aa'></div>
     </div>
 </div>
 
 
-<!--控制器代码部分-->
+<!--加载外部控制器js文件-->
 <script>
-    (function() {
-        angular.module('app').controller('topNavbar', ['$rootScope', '$scope', fn]);
-
-        function fn($rootScope, $scope) {
-            $rootScope['topNavbar'] = $scope;
-
-            //需要载入的内容，仅限延迟使用，即时使用的需要加入index.html
-            _cfg.load('swal');
-            _cfg.load('toastr');
-
-            //切换页面
-            $scope.activeMenu = 0;
-            $scope.curpage = $rootScope.url.pageReport;
-            $scope.pages = ['pageLogin', 'pageTask', 'pageReport', 'pageSet'];
-            $scope.changePage = function(n) {
-                var ctrlr = $scope.pages[n];
-                $scope.activeMenu = n;
-                $scope.curpage = $rootScope.url[ctrlr];
-            };
-            $scope.changePage(0);
-        };
-    })();
+    _fns.addCtrlrJs('topNavbar');
 </script>
 
 

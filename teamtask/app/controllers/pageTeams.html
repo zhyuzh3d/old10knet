@@ -1,0 +1,63 @@
+<!--团队任务页面框架-->
+
+<!--控制器界面部分-->
+<div id='pageTeams' ng-controller='pageTeams' class='container-fluid'>
+
+    <!--补充的css样式，都以控制器开头-->
+    <style>
+        .pageTeam-temp {
+            font-weight: bold;
+        }
+    </style>
+
+    <!--html界面-->
+    <div class='col-xs-10 col-sm-10 col-md-10 col-lg-8 col-xs-offset-1 col-sm-offset-1 col-md-offset-1 col-lg-offset-2' style='margin-top:2em'>
+        <!--      按钮组-->
+        <div class="row">
+            <button type="button" class="btn btn-success navbar-btn" ng-click='addTeam()'>添加团队</button>
+        </div>
+        <!--      列表组-->
+        <div class="row">
+            <div class="panel panel-default" ng-repeat='tm in teams' style="margin-bottom:0.75em">
+                <div class="panel-body">
+                    <div class='col-xs-6' style="text-align:left;padding:0">
+                        <span ng-bind="tm.name"></span>
+                        <span ng-show='tm.taskCount'>(
+                        <span ng-bind='tm.taskCount'>0</span>)
+                        </span>
+                    </div>
+                    <div class='col-xs-6' style="text-align:right;padding:0">
+                        <span ng-bind="tm.author.nick">未命名用户</span>
+                        <span ng-bind="tm.time | date:'MM-dd/hh:mm'">00-00 00:00</span>
+                        <span class='fa fa-remove fa-1x' style="cursor:pointer;margin-left:1em;color:#AAA" ng-click="delTeam(tm)"></span>
+                    </div>
+                </div>
+                <div class="panel-footer" style="padding:4px 15px">
+                    <span class='fa fa-plus fa-1x' style="cursor:pointer;margin-right:1em;color:#AAA" ng-click="addMember(tm)"></span>
+                    <span class='badge' ng-repeat='mbr in tm.members' style="margin-right:1em">
+                        <span ng-click='delMember(tm,mbr)' style="cursor:pointer">
+                            <span ng-bind='mbr.nick' ></span>
+                    <span class='fa fa-remove fa-1x'></span>
+                    </span>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--加载外部控制器js文件-->
+<script>
+    _fns.addCtrlrJs('pageTeams');
+</script>
+
+
+
+
+
+
+
+
+
+
+<!---->
