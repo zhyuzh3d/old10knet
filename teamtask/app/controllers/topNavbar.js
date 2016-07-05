@@ -24,6 +24,6 @@
 
 
         };
-        $scope.changePage('pageTasks');
+        $scope.changePage(_cfg.startPage);
     };
 })();

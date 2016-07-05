@@ -13,6 +13,62 @@ var _xdat = {}; //共享变量
     _cfg.host = window.location.host;
     _cfg.homePath = 'teamtask';
 
+    _cfg.startPage='pageTasks';
+
+    //历史相关设置
+    _cfg.hisOpTypes = {
+        task: {
+            add: {
+                value: 'add',
+                txt: '添加一个任务'
+            },
+            delete: {
+                value: 'delete',
+                txt: '删除一个任务'
+            },
+            addMember: {
+                value: 'addMember',
+                txt: '添加一个成员'
+            },
+            deleteMember: {
+                value: 'deleteMember',
+                txt: '删除一个成员'
+            },
+            setEndTime: {
+                value: 'setTaskEndTime',
+                txt: '设定截止日期'
+            },
+            setState: {
+                value: 'setState',
+                txt: '修改任务状态'
+            },
+            addPost: {
+                value: 'addPost',
+                txt: '添加一个跟帖'
+            },
+        }
+    }
+
+
+    //任务的状态
+    _cfg.taskStates = [{
+        value: 'undefined',
+        icon: 'fa fa-ban fa-lg',
+        txt: '未开始'
+    }, {
+        value: 'doing',
+        icon: 'fa fa-play-circle fa-lg',
+        txt: '正在做'
+    }, {
+        value: 'done',
+        icon: 'fa fa-check-circle fa-lg',
+        txt: '已完成'
+    }, {
+        value: 'drop',
+        icon: 'fa fa-minus-circle fa-lg',
+        txt: '已放弃'
+    }];
+
     //自动载入库文件
     _cfg.libs = {
         swal: {
@@ -38,7 +94,8 @@ var _xdat = {}; //共享变量
         'app.services',
         'app.filters',
         'app.directives',
-        'app.controllers'
+        'app.controllers',
+        'ui.bootstrap'
     ]).config(
         function angularConfig($locationProvider, $controllerProvider, $compileProvider, $filterProvider, $provide) {
             $locationProvider.html5Mode(true);
@@ -61,13 +118,13 @@ var _xdat = {}; //共享变量
         _xdat = $rootScope.xdat = {};
 
         //加载控制器
-        $rootScope.topNavbarUrl = _fns.getCtrlr('topNavbar');
+        $rootScope.startCtrlr = _fns.getCtrlr('topNavBar');
     });
 
 
     /*获取地址栏参数
      */
-    _fns.getUrlParam = function (name) {
+    _fns.getUrlParam = function(name) {
         var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
         var r = window.location.search.substr(1).match(reg);
         if (r != null) return unescape(r[2]);
@@ -76,7 +133,7 @@ var _xdat = {}; //共享变量
 
     /*获取根目录相对于当前页面的相对地址
      */
-    _fns.getRelUrl = function (fname) {
+    _fns.getRelUrl = function(fname) {
         var res = _cfg.homePath + fname;
 
         //获取当前页面地址，转换为根目录地址
@@ -90,14 +147,14 @@ var _xdat = {}; //共享变量
 
     /*获取路由页面，用于换页
      */
-    _fns.getCtrlr = function (ctrlrname) {
+    _fns.getCtrlr = function(ctrlrname) {
         var path = '/app/controllers/' + ctrlrname + '.html';
         var res = _fns.getRelUrl(path);
         return res;
     };
 
     /*自动载入控制器对应的js*/
-    _fns.addCtrlrJs = function (ctrlrname) {
+    _fns.addCtrlrJs = function(ctrlrname) {
         var all_js = document.getElementsByTagName("script");
         var cur_js = $(all_js[all_js.length - 1]);
         cur_js.prev().append('<script src="' + _fns.getRelUrl('/app/controllers/' + ctrlrname + '.js') + '"><\/script>');
@@ -105,21 +162,21 @@ var _xdat = {}; //共享变量
 
     /*向head添加需要初始化的库，参照_cfg.libs
      */
-    _fns.addLib = function (libstr) {
+    _fns.addLib = function(libstr) {
         var lib = _cfg.libs[libstr];
         if (libstr && lib && !lib.loaded) {
             for (var attr in lib) {
                 var htmlstr = '';
                 //匹配文件类型
                 switch (attr) {
-                case 'js':
-                    htmlstr = '<script src="' + lib[attr] + '"><\/script>';
-                    break;
-                case 'css':
-                    htmlstr = '<link href="' + lib[attr] + '" rel="stylesheet">';
-                    break;
-                default:
-                    break;
+                    case 'js':
+                        htmlstr = '<script src="' + lib[attr] + '"><\/script>';
+                        break;
+                    case 'css':
+                        htmlstr = '<link href="' + lib[attr] + '" rel="stylesheet">';
+                        break;
+                    default:
+                        break;
                 };
                 //载入文件
                 if (htmlstr) {
@@ -139,7 +196,7 @@ var _xdat = {}; //共享变量
 
     /*重新应用scope
      */
-    _fns.applyScope = function (scp) {
+    _fns.applyScope = function(scp) {
         if (scp && scp.$root && scp.$root.$$phase != '$apply' && scp.$root.$$phase != '$digest') {
             scp.$apply();
         };
@@ -157,8 +214,9 @@ var _xdat = {}; //共享变量
 
     /*ctrlr获取上层传来的参数，优先使用xdat[ctrlr],其次使用dom的属性
     需要具有scope.ctrlrName属性
+    写入到$scope.args
      */
-    _fns.getCtrlrAgs = function (scope, element) {
+    _fns.getCtrlrAgs = function(scope, element) {
         var res;
         if (scope) {
             if (!scope.args) scope.args = {};

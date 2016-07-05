@@ -1,0 +1,32 @@
+<!--顶部导航栏-->
+
+<!--控制器界面部分-->
+<div id='_test' ng-controller='_test' class='container-fluid'>
+
+    <!--补充的css样式，都以控制器开头-->
+    <style>
+    </style>
+    <div class="row">
+        <ul>
+        <li ng-repeat='p in ps | orderBy:"time"'>{{p.name}}</li>
+        </ul>
+    </div>
+
+</div>
+
+
+<!--加载外部控制器js文件-->
+<script>
+    _fns.addCtrlrJs('_test');
+</script>
+
+
+
+
+
+
+
+
+
+
+<!---->
