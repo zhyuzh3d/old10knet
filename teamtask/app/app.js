@@ -13,7 +13,7 @@ var _xdat = {}; //共享变量
     _cfg.host = window.location.host;
     _cfg.homePath = 'teamtask';
 
-    _cfg.startPage='pageTasks';
+    _cfg.startPage = 'pageTasks';
 
     //历史相关设置
     _cfg.hisOpTypes = {
@@ -41,6 +41,14 @@ var _xdat = {}; //共享变量
             setState: {
                 value: 'setState',
                 txt: '修改任务状态'
+            },
+            editContent: {
+                value: 'editContent',
+                txt: '修改任务内容'
+            },
+            editTitle: {
+                value: 'editTitle',
+                txt: '修改标题内容'
             },
             addPost: {
                 value: 'addPost',
@@ -71,6 +79,23 @@ var _xdat = {}; //共享变量
 
     //自动载入库文件
     _cfg.libs = {
+        jquery: {
+            js: '//cdn.bootcss.com/jquery/2.2.4/jquery.min.js',
+        },
+        bootstrap: {
+            js: '//cdn.bootcss.com/bootstrap/3.3.6/js/bootstrap.min.js',
+            css: '//cdn.bootcss.com/bootstrap/3.3.6/js/bootstrap.min.js'
+        },
+        fontawesome: {
+            css: '//cdn.bootcss.com/font-awesome/4.6.3/css/font-awesome.min.css'
+        },
+        wilddog: {
+            js: '//cdn.wilddog.com/js/client/current/wilddog.js'
+        },
+        angular: {
+            js: '//cdn.bootcss.com/angular.js/1.3.20/angular.min.js',
+            js2: '//cdn.bootcss.com/angular.js/1.3.20/angular-resource.min.js'
+        },
         swal: {
             js: '//cdn.bootcss.com/sweetalert/1.1.3/sweetalert.min.js',
             css: '//cdn.bootcss.com/sweetalert/1.1.3/sweetalert.min.css'
@@ -84,7 +109,20 @@ var _xdat = {}; //共享变量
         },
         qcode: {
             js: '//cdn.bootcss.com/jquery.qrcode/1.0/jquery.qrcode.min.js'
-        }
+        },
+        moment: {
+            js: '//cdn.bootcss.com/moment.js/2.13.0/moment.min.js'
+        },
+        module: {
+            js: '//' + _cfg.host + '/lib/simditor/latest/scripts/module.js',
+        },
+        simditor: {
+            lib: 'module',
+            css: '//' + _cfg.host + '/lib/simditor/latest/styles/simditor.css',
+            js1: '//' + _cfg.host + '/lib/simditor/latest/scripts/hotkeys.js',
+            js2: '//' + _cfg.host + '/lib/simditor/latest/scripts/uploader.js',
+            js3: '//' + _cfg.host + '/lib/simditor/latest/scripts/simditor.js',
+        },
     };
 
     /*angular初始设置,提供全局功能函数
@@ -120,6 +158,20 @@ var _xdat = {}; //共享变量
         //加载控制器
         $rootScope.startCtrlr = _fns.getCtrlr('topNavBar');
     });
+
+    //自定义filter过滤器
+
+    //显示为html样式
+    _app.filter('toTrustHtml', ['$sce',
+        function($sce) {
+            return function(text) {
+                return $sce.trustAsHtml(text);
+            }
+        }
+    ]);
+
+
+
 
 
     /*获取地址栏参数
@@ -167,18 +219,17 @@ var _xdat = {}; //共享变量
         if (libstr && lib && !lib.loaded) {
             for (var attr in lib) {
                 var htmlstr = '';
-                //匹配文件类型
-                switch (attr) {
-                    case 'js':
-                        htmlstr = '<script src="' + lib[attr] + '"><\/script>';
-                        break;
-                    case 'css':
-                        htmlstr = '<link href="' + lib[attr] + '" rel="stylesheet">';
-                        break;
-                    default:
-                        break;
+
+                //匹配文件类型,如果是lib则关联载入
+                if (attr.substr(0, 2) == 'js') {
+                    htmlstr = '<script src="' + lib[attr] + '"><\/script>';
+                } else if (attr.substr(0, 3) == 'css') {
+                    htmlstr = '<link href="' + lib[attr] + '" rel="stylesheet">';
+                } else if (attr == 'lib') {
+                    _fns.addLib(lib[attr]);
                 };
-                //载入文件
+
+                //载入文件到头部
                 if (htmlstr) {
                     $('head').append(htmlstr);
                     lib.loaded = true;

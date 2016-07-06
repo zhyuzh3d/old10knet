@@ -13,6 +13,8 @@
         //载入外部依赖
         _fns.addLib('swal');
         _fns.addLib('toastr');
+        _fns.addLib('moment');
+        _fns.addLib('simditor');
 
         //如果未登录自动跳到登陆
         var xdat = $rootScope.xdat;
@@ -56,7 +58,9 @@
                     var newobj = _wdapp.child('tasks').push({
                         title: ipt,
                         time: Number(new Date()),
+                        endTime: Number(moment().add(1, 'days')),
                         authorId: xdat.authData.uid,
+                        endDatePickerIsOpen: true,
                     });
 
                     //写入key属性
@@ -106,10 +110,10 @@
 
                         //数据处理
                         $scope.tasks[task.key] = task;
-                        task.time = new Date(task.time);
+                        task.timeFmt =moment(task.time).format('MM/DD');
+//                        task.time = new Date(task.time);
                         task.endTime = new Date(task.endTime);
-                        //                        task.stateFa = $scope.taskStateFas[task.state] || 'fa fa-ban';
-                        task.key = key;
+                        task.key = task.key;
 
                         //读取每个作者信息
                         _wdapp.child('users/' + task.authorId).on("value", function(shot, err) {
@@ -251,6 +255,9 @@
             _wdapp.child('tasks/' + tsk.key).update({
                 endTime: tim
             }, function(err, shot) {
+                _wdapp.child('tasks/' + tsk.key).update({
+                    endDatePickerIsOpen: false
+                });
                 if (err) {
                     toastr.error('设置任务截止日期失败:' + err);
                 } else {
@@ -285,6 +292,83 @@
                 taskKey: tsk.key
             });
         };
+
+        //打开文本编辑器
+        $scope.openEditor = function(tsk, evt) {
+            var tarjo = $(evt.target).siblings('#taskContent');
+
+            //清理
+            if (tsk.contentTa) tsk.contentTa.remove();
+            if (tsk.contentEditor) tsk.contentEditor.destroy();
+
+            //创建ta
+            var tajo = tsk.contentTa = $('<textarea id="ccc" autofocus></textarea>');
+            tajo.val(tsk.content);
+            tarjo.after(tajo);
+            tsk.editContentMod = true;
+
+            //创建编辑器
+            var editor = tsk.contentEditor = new Simditor({
+                textarea: tajo,
+                upload:true,
+            });
+
+            console.log('uploader',editor.uploader);
+
+            //修改编辑器样式
+            var editorjo = tarjo.parent().children('.simditor');
+            editorjo.css({
+                'border': 'none',
+            });
+            editorjo.find('.simditor-body').css({
+                'min-height': '2em',
+                'padding': '15px'
+            });
+        };
+
+        //隐藏内容编辑器
+        $scope.closeContentEditor = function(tsk) {
+            if (tsk.contentTa) tsk.contentTa.remove();
+            if (tsk.contentEditor) tsk.contentEditor.destroy();
+            tsk.editContentMod = false;
+        };
+
+        //保存内容
+        $scope.saveContent = function(tsk) {
+            var ctthtml = tsk.content = tsk.contentEditor.getValue();
+            _wdapp.child('tasks/' + tsk.key).update({
+                content: ctthtml
+            }, function(err, shot) {
+                if (err) {
+                    toastr.error('保存内容失败:' + err);
+                } else {
+                    //记录操作
+                    $scope.addTaskHis(xdat.authData.uid, tsk.key, hisOpTypes.editContent.value, ctthtml);
+                    tsk.closeContentEditor(tsk);
+                };
+            });
+        };
+
+
+        //保存标题
+        $scope.saveTitle = function(tsk) {
+            _wdapp.child('tasks/' + tsk.key).update({
+                title: tsk.title,
+            }, function(err, shot) {
+                if (err) {
+                    toastr.error('保存标题失败:' + err);
+                } else {
+                    //记录操作
+                    $scope.addTaskHis(xdat.authData.uid, tsk.key, hisOpTypes.editTitle.value, tsk.title);
+                    tsk.editTitleMod = false;
+                };
+            });
+        }
+
+
+        //显示时间格式
+
+
 
 
         //---end--
