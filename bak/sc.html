@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html ng-app="app" ng-controller="dataController">
+<head>
+<title ng-bind="projects.title+'-项目工场'"></title>
+<meta name="keywords" content="大学,实践,大学生,计算机,IT,互联网,信息技术,课程设计,课设,毕业设计,毕设,5分钟实时答疑,比赛,竞赛,专家,行业专家,项目,开发,实战,代码,编程,App,软件,UI,UE">
+<meta name="description" content="{{projects.title}}">
+
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+<script type="text/javascript" src="../../_jslibs/jquery-2.1.1.min.js"></script>
+<link href="../../_jslibs/bootstrap-3.3.5-dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="../../_jslibs/bootstrap-3.3.5-dist/js/bootstrap.min.js"></script>
+
+
+
+<link rel="stylesheet" type="text/css" href="../../_css/font-awesome-4.4.0/css/font-awesome.min.css" />
+
+<link rel="stylesheet" href="../../_css/common.css" type="text/css">
+<link rel="stylesheet" type="text/css" href="../../_css/style.css">
+
+<script src="../../js/angular.min.js"></script>
+
+<script src="../../js/angular-cookies.min.js"></script>
+<script src="../../js/angular-animate.min.js"></script>
+
+<script type="text/javascript" src="../../_jslibs/ui-bootstrap-tpls-0.13.3.min.js"></script>
+
+<script src="//cdn.bootcss.com/angular-i18n/1.5.0-beta.1/angular-locale_zh-cn.min.js"></script>
+
+<script src="../../_jslibs/socket.io-1.2.0.js"></script>
+
+<link href="http://cdn.bootcss.com/toastr.js/latest/css/toastr.min.css" rel="stylesheet">
+<script src="http://cdn.bootcss.com/toastr.js/latest/js/toastr.min.js"></script>
+<script src="../../_geminit/gem.js"></script>
+<script type="text/javascript" src="js/app.js"></script>
+
+<script src="../../_jslibs/moment.min.js"></script>
+<script src="../../_jslibs/sun/basics.js"></script>
+
+<style>
+	.filelist{
+		/*margin-left:15px;*/
+	}
+	.filelist:hover{
+		cursor:pointer;
+		text-decoration:underline;
+	}
+	.pointer:hover{
+		cursor: pointer;
+	}
+
+	.l-body-list .progress-bar-success {
+		background: #00BBB5;
+	}
+
+	.l-body-list .progress {
+		border-radius:0;
+		background: #1d6c7f;
+		margin-bottom: 5px;
+	}
+
+	pre {
+		 white-space: pre-line;
+	}
+
+	.animate-show {
+	  -webkit-transition:all linear 0.1	s;
+	  transition:all linear 0.1s;
+	}
+	.animate-show.ng-hide {
+      /*line-height:0;*/
+      height: 0;
+      line-height:0;
+      padding: 0px 10px;
+
+  }
+
+/*	.ll-content-main {
+	    -webkit-transition:all linear 0.1s;
+	    transition:all linear 0.1s;
+	}
+
+    .animate-show.ng-hide {
+        height:0;
+    }*/
+
+/*	.ll-content-main.ng-hide-add, .ll-content-main.ng-hide-remove{
+		 -webkit-transition:all 1s linear ;
+  		 transition:all 1s linear;
+	}
+
+	.ll-content-main.ng-hide-add {
+		height: 100%;
+	}
+
+	.ll-content-main.ng-hide-add.ng-hide-add-active {
+		height: 0;
+	}
+
+	.ll-content-main.ng-hide-remove {
+		height: 0;
+	}
+
+	.ll-content-main.ng-hide-remove.ng-hide-remove-active {
+		height: 100%;
+	}*/
+
+
+</style>
+</head>
+<script type="text/ng-template" id="myModalContent.html">
+        <div class="modal-body" style="text-align: center;padding: 50px 30px;">
+          <h1 style="font-size: 16px;margin-bottom: 10px;">您的协作码生成成功了!</h1>
+          <h2 style="font-size: 16px;margin-bottom: 10px;">请将下面的数字告诉协作者</h2>
+          <p style="font-size: 30px;font-weight: 900;margin-bottom: 10px;" ng-bind="codedata.code"><p>
+          <button style="padding: 5px 50px;" class="btn btn-warning" type="button" ng-click="cancel()">我知道啦</button>
+        </div>
+</script>
+<body>
+<div class="all-wrapper clearfix" ng-app="myApp">
+	<div class="header">
+		<div class="header-content">
+		<!-- baseTopUrl -->
+   			 <div id='baseTopUrl' ng-include="'../../_controllers/base/baseTop.html'"></div>
+		</div>
+	</div>
+	<div class="wrap-content" id="wrap-content">
+		<div class="wrap-page-content clearfix">
+			<!-- 左侧 -->
+			<div class="page-content-left mh5" id="page-content-left" style="background:#1c758a">
+				<div class="l-page">
+					<div class="lesson-content">
+						<div class="lesson-content-header clearfix">
+							<!-- <p class="l-tabs" ng-bind="tecdir"></p> -->
+							<div class="l-body clearfix row " ng-controller="upCtrl">
+								<div class="l-body-img col-md-3" style="position:relative;overflow: hidden;border-radius: 5px;" ng-clock>
+									<img ng-src={{thum}}>
+				                      <div style="position: absolute;bottom: 0;left: 0;" ng-if="projects.from == 2" ng-cloak>
+			                              <img src="../../_imgs/tag_locl2.png"  style="width:40px;height:40px;">
+			                          </div>
+								</div>
+								<div class="l-body-list col-md-6">
+									<p><span ng-bind='tecdir' style="background: #00bbb5;padding: 2px 10px;border-radius: 10px;font-size: 12px;"></span></p>
+									<h1>
+										<span ng-bind="projects.title"></span>
+										<a ng-if="projects.author.id == baseTopCtrlr.user.id || baseTopCtrlr.user.id == 1" ng-href="../project/projecteditm.html?projectid={{projects.id}}">
+										<span class="glyphicon glyphicon-pencil" style="color: #00A3A5;margin-left: 5px;font-size: 22px;cursor: pointer;"></span></a>
+										<!-- 协作码 -->
+										<!-- <span ng-if="code" style="margin-left:10px;color:#fff;font-size: 14px;font-weight: 100;">协作码:<i style="    background: #009CC3;padding: 2px 10px;margin-left: 5px;font-size: 12px;" ng-bind="code"></i></span> -->
+										<!-- <button ng-if="!code" type="button" class="btn btn-sm btn-warning" ng-click="open('sm')">生成协作码</button> -->
+
+									</h1>
+									<p>
+									距离课程截止日期还有<span ng-bind="timeover"></span>天<span ng-click="changedataboxhide()" class="glyphicon glyphicon-calendar" style="margin-left:10px;cursor:pointer;"></span>
+									<a href="../misold/projectreportpaper.html?projectid={{projects.id}}" style="font-size: 12px;color: #fff;opacity: 0.7;">[文档]</a>
+									<a href="../misold/projecttestpaper.html?projectid={{projects.id}}" style="font-size: 12px;color: #fff;opacity: 0.7;">[打印测试页]</a>
+									<!-- 已经完成<span ng-bind="sblocks_done"></span>/<span ng-bind="blocks_length"></span>模块，<span ng-bind="stasks_done"></span>/<span ng-bind="tasks_length"></span>任务 -->
+									</p>
+									<!-- 模块完成度 -->
+									<p>
+										<progressbar animate="false" value="getper(sblocks_done,blocks_length)" type="success">
+										<b style="color:white; white-space:nowrap;margin-left: 6px;">
+										已完成{{sblocks_done}}/{{blocks_length}}模块
+										</b>
+										</progressbar>
+									</p>
+									<!-- 任务完成度 -->
+<!-- 									<p>
+										<progressbar animate="false" value="getper(stasks_done,tasks_length)" type="success">
+										<b style="color:white; white-space:nowrap;">
+										已完成{{stasks_done}}/{{tasks_length}}任务
+										</b>
+										</progressbar>
+									</p> -->
+									<div class="change-data-box" ng-if = "changeboxhide" ng-cloak>
+										<div style="height:40px;background:#575757;color:#fff; text-align:center;padding: 10px 0">
+											<p>改变交付日期</p>
+										</div>
+										<div style="padding:20px;">
+											<p style="color:#444;">原交付日期:<span ng-bind="endtime"></span></p>
+											<div style="margin-bottom:5px;">
+												<p style="color:#444;">
+												<label>修改日期为:{{dt | date:'yyyy-MM-dd'}}</label>
+												<input style="color:#14758B;" type="text" class="form-control" ng-model="dt" datepicker-popup  is-open="status.opened" min-date="minDate" max-date="maxDate" datepicker-options="dateOptions" date-disabled="disabled(date, mode)" ng-required="true" close-text="Close">
+												</p>
+											</div>
+											<datepicker ng-model="dt" min-date="minDate" show-weeks="true" class="well well-sm" custom-class="getDayClass(date, mode)"></datepicker>
+											<div style="text-align:center;">
+												<a class="btn btn-success" href="" style="padding: 5px 20px;" ng-click="changedatasure()">确定</a>
+												<a class="btn btn-default" href="" ng-click = "changedataboxhide()" style="padding: 5px 20px;">取消</a>
+											</div>
+										</div>
+									</div>
+									<p ng-show = "courses_length.length">共计{{courses_length}}个相关课程，查看详情</p>
+									<p ng-show = "courses_length.length">共{{files_length}}个相关下载，下载</p>
+								</div>
+								<div class="col-md-3" style="float:right;">
+									<div class="row">
+										<p class="col-md-12" style="font-size:16px;">上传文件</p>
+									</div>
+									<div class="row" style="">
+										<div class="col-md-12">
+											<button class="btn btn-warning" id="scheduledocup" style="font-size:12px;background:#00BBB5;border: none;width: 160px;margin-bottom: 5px;" ng-click="$root.uploadFile(2,$event,docresfn,'dd')">选题报告（doc文件）</button>
+											<span class="elip" style="display: inline-block;width: 100%;float: left;margin-bottom: 5px;" ng-repeat="up in $root.uploaded.scheduledocup track by $index">
+												<span class="filelist" ng-click="filedown(up)" style="color: #fff;font-size:12px;">
+												{{up.file}}
+												</span>
+											</span>
+										</div>
+									</div>
+									<div class="row" style="">
+										<div class="col-md-12">
+											<button class="btn btn-warning" id="schedulefileup" style="font-size:12px;background:#00BBB5;border: none;width: 160px;margin-bottom: 5px;" ng-click="$root.uploadFile(4,$event,fileresfn,'dd')">项目文件包（rar/zip文件）</button>
+											<span class="elip" style="display: inline-block;width: 100%;float: left;margin-bottom: 5px;" ng-repeat="up in $root.uploaded.schedulefileup track by $index">
+												<span title={{up.file}} class="filelist" ng-click="filedown(up)" style="color: #fff;font-size:12px">
+												{{up.file}}
+												</span>
+											</span>
+										</div>
+									</div>
+                                    <div class="row" style="" ng-show="zxsch.author.id == baseTopCtrlr.user.id">
+                                        <div class="col-md-12">
+                                            <button class="btn btn-warning" id="schedulemp4up" style="font-size:12px;background:#00BBB5;border: none;width: 160px;margin-bottom: 5px;" ng-click="$root.uploadFile(3,$event,mp4resfn,'dd')">上传答辩视频（mp4文件）</button>
+											<span class="elip" style="display: inline-block;width: 100%;float: left;margin-bottom: 5px;" ng-repeat="up in $root.uploaded.schedulemp4up track by $index">
+                                                <span class="glyphicon glyphicon-remove" ng-click="delaudio(up)" style="cursor: pointer;"></span>
+                                                <span class="filelist" ng-click="filedown(up)" style="color: #fff;font-size:12px">
+												{{up.file}}
+												</span>
+											</span>
+                                        </div>
+                                    </div>
+
+
+								</div>
+							</div>
+							<!-- 成员协作 -->
+	<!-- 						<div class="l-brief" style="background:#1196a2;" ng-if="joinusers.length" ng-init="setshowjoinusers = true">
+								<div style="height:32px;line-height:32px;background:#1d838c;padding:0 13px 0 20px;cursor: pointer;" class="clearfix" ng-click="setshowjoinusers = !setshowjoinusers">
+									<p style="float:left;opacity: 0.77;">成员协作</p>
+									<i style="float:right;opacity: 0.77;  margin-top: 8px;font-weight: 900;" ng-class="{true:'glyphicon glyphicon-chevron-down',false:'glyphicon glyphicon-chevron-right'}[!setshowjoinusers]"></i>
+								</div>
+								<div ng-show="setshowjoinusers" style="padding: 15px 0;">
+	                                <ul style="row" class="clearfix">
+		                                    <li ng-repeat = "user in joinusers" class="col-md-2"  style="text-align: center;cursor: pointer;" popover="123">
+		                                        <div style="background:#fff url('{{user.thum}}');background-size:cover;    width: 60px;height: 60px;border-radius: 50%;display: inline-block;">
+		                                        </div>
+		                                        <div>
+		                                        	<span ng-bind="user.name"></span>
+		                                        </div>
+		                                    </li>
+		                            </ul>
+								</div>
+							</div> -->
+							<!-- 项目简介 -->
+							<div class="l-brief" style="background:#1196a2;margin-top: 10px;">
+								<div style="height:32px;line-height:32px;background:#1d838c;padding:0 13px 0 20px;cursor: pointer;" class="clearfix" ng-click="setshowbrief()">
+									<p style="float:left;opacity: 0.77;">项目简介</p>
+									<i style="float:right;      opacity: 0.77;  margin-top: 8px;font-weight: 900;" ng-class="{true:'glyphicon glyphicon-chevron-down',false:'glyphicon glyphicon-chevron-right'}[!showbrief]"></i>
+								</div>
+								<div ng-show="!showbrief" style="padding: 15px;">
+									<pre><p ng-bind="brief"></p></pre>
+								</div>
+							</div>
+							<!-- 界面截图 -->
+                            <div class="projectbrief-content-img clearfix" style="margin-top:10px;margin-bottom:10px;background:#1196a2;" ng-if="projects.shots.length !==0">
+                                <div style="height:32px;line-height:32px;background:#1d838c;padding:0 13px 0 20px;cursor: pointer;" class="clearfix" ng-click="setshowimgbox()">
+									<p style="float:left;     opacity: 0.77;">界面截图(<span ng-bind="projects.shots.length"></span>)</p>
+									<i style="float:right;      opacity: 0.77;  margin-top: 8px;font-weight: 900;" ng-class="{true:'glyphicon glyphicon-chevron-down',false:'glyphicon glyphicon-chevron-right'}[!showimgbox]"></i>
+								</div>
+								<div ng-show="!showimgbox" style="padding: 15px;">
+	                               <!--  <ul style="row">
+	                                    <li style="cursor:pointer;display: inline-block;    float: none;"> -->
+	                                        <!-- <div class="projectbrief-content-shots" ng-click='$root.setPicPop($event)' href='{{shot.url}}' style="background:#fff url('{{shot.url}}');background-size:cover;">
+	                                        </div> -->
+	                                        <img  ng-repeat = "shot in projects.shots" title={{shot.file}}  ng-click='$root.setGalleryPop($event)' ng-src={{shot.url}} href={{shot.url}} style="margin:5px 10px; cursor:pointer;width: 100px;height: 100px;overflow: hidden;background: #fff;border: 1px solid rgba(255,255,255,0.25);border-radius: 4px;">
+	                               <!--      </li>
+	                                </ul> -->
+                                </div>
+                            </div>
+                         	<!-- 相关文件 -->
+                            <div style="margin-top:10px;margin-bottom:10px;background:#1196a2;"  ng-if="projects.files.length !== 0">
+                            	<div style="height:32px;line-height:32px;background:#1d838c;padding:0 13px 0 20px;cursor: pointer;" class="clearfix" ng-click="setshowfilebox()">
+									<p style="float:left;opacity: 0.77;">相关文件(<span ng-bind="projects.files.length"></span>)</p>
+									<i style="float:right; opacity: 0.77;  margin-top: 8px;font-weight: 900;" ng-class="{true:'glyphicon glyphicon-chevron-down',false:'glyphicon glyphicon-chevron-right'}[!showfilebox]"></i>
+								</div>
+								<div ng-show="!showfilebox" style="padding: 15px;">
+                            	<ul>
+                            		<li ng-repeat="data in projects.files">
+                            			<a ng-href={{data.url}} style="color:#fff;"><span style="margin-right:5px;" class="glyphicon glyphicon-download"></span><span ng-bind="data.file"></span></a>
+                            		</li>
+                            	</ul>
+                            	</div>
+                            </div>
+                            <!-- 前置课程 -->
+                            <div ng-if="courses.length !== 0" style="margin-top:10px;margin-bottom:10px;background:#1196a2;" >
+                            	<div style="height:32px;line-height:32px;background:#1d838c;padding:0 13px 0 20px;cursor: pointer;" class="clearfix" ng-click="setshowlessonbox()">
+									<p style="float:left;     opacity: 0.77;">前置课程与工具下载(<span ng-bind="courses.length"></span>)</p>
+									<i style="float:right;      opacity: 0.77;  margin-top: 8px;font-weight: 900;" ng-class="{true:'glyphicon glyphicon-chevron-down',false:'glyphicon glyphicon-chevron-right'}[!showlessonbox]"></i>
+								</div>
+								<div ng-show="showlessonbox" style="padding: 15px;">
+                            	<ul>
+                            		<li ng-repeat="data in courses">
+                            			<div>
+                            				<p><a href="{{data.url}}" target="_blank" style="color:#fff;">{{data.title}}</a></p>
+                            			</div>
+                            		</li>
+                            	</ul>
+                            	</div>
+                            </div>
+						</div>
+						<div class="lesson-lcontent-body">
+							<div class="lesson-line">
+								<span class="lesson-line-bg"></span>
+								<ul>
+								<!-- 课程主体列表开始 -->
+									<li ng-repeat = "block in blocks">
+										<div class="timer">
+										</div>
+										<span ng-class="(block.stateBool)?'unicon':'icon'" ng-click="clickState($index)" changepic tid = {{block.state}}></span>
+										<div class="ll-content">
+											<div>
+												<h1 style="margin-right:100px;" id="ll-content-tit" ng-click="showClick($index)">{{$index + 1}}.<span ng-bind="block.title?block.title:'未命名模块'"></span></h1>
+												<span ng-click="showClick($index)" class = "ll-content-icon glyphicon" ng-class= "(block.showtrue)?'glyphicon-chevron-down':'glyphicon-chevron-right'" style="cursor: pointer;"></span>
+												<!-- 添加注释 -->
+												<i btnshow title ="添加注释" class = "about-task-note glyphicon glyphicon-tags" style="top:8px;right:50px;"></i>
+												<i class="about-task-note-length" style="top:3px;right:70px">{{block.note.count}}</i>
+												<div class="task-note-content">
+													<div class="clearfix">
+														<a href=""><span class = "glyphicon glyphicon-pencil" style= "font-size:14px;padding-right:3px;"></span>添加注释</a>
+														<textarea class="form-control" ng-model="block.text"></textarea>
+														<div style="border-radius: 0;" class="task-note-add-btn btn btn-primary" ng-click = "blockclickNote(block)">发表</div>
+													</div>
+													<div class="task-note-list" ng-repeat = "n in block.note.notes">
+															<h3>{{n.time}}</h3>
+															<p>{{n.text}}</p>
+															<span title= "删除" class="task-note-list-icon glyphicon glyphicon-remove" ng-click="deletenote(n)"></span>
+													</div>
+												</div>
+											</div>
+											<div class="ll-content-border"></div>
+											<!-- 收起页开始 -->
+											<div class="ll-content-main animate-show clearfix" style="overflow:hidden;" id="ll-content-main" ng-show ="block.showtrue" >
+												<div class="main-explain">
+													<p><pre>{{block.brief}}</pre></p>
+                                                    <div class="projectbrief-content-img clearfix" style="margin-top:12px">
+                                                    	<img ng-repeat = "shot in block.briefpics" style="margin:5px 10px; cursor:pointer;width: 100px;height: 100px;overflow: hidden;background: #fff;border: 1px solid rgba(255,255,255,0.25);border-radius: 4px;" ng-src={{shot.url}} href={{shot.url}} title={{shot.file}}  ng-click='$root.setGalleryPop($event)' >
+                                                     <!--    <ul>
+                                                            <li ng-repeat = "shot in block.briefpics" style="cursor:pointer">
+                                                                <div class="projectbrief-content-shots" ng-click='$root.setPicPop($event)' href='{{shot.url}}' style="background:#fff url({{shot.url}});background-size:cover;">
+                                                                </div>
+                                                            </li>
+                                                        </ul> -->
+                                                    </div>
+												</div>
+												<div class="about-lesson" ng-show = "block.courses.length">
+													<dl>
+														<dt>相关课程</dt>
+														<dd ng-repeat = "c in blocks[$index].courses"><a ng-href="{{c.url}}" style="color:#E5F42F;"><span class="glyphicon glyphicon-expand"></span>{{c.title}}</a></dd>
+													</dl>
+												</div>
+												<div class="about-data" ng-show = "block.files.length">
+													<dl>
+														<dt>相关资料</dt>
+														<dd ng-repeat = "i in blocks[$index].files"><a ng-href="{{i.url}}" style="color:#E5F42F;"><span class="glyphicon glyphicon-expand"></span>{{i.file}}</a></dd>
+													</dl>
+												</div>
+												<div class="about-task">
+													<dl>
+														<dt>任务模块</dt>
+														<dd ng-repeat = "task in blocks[$index].tasks">
+															<h2>{{$index+1}}.{{task.title}}</h2>
+															<div class="task-note-content">
+																<div class="clearfix">
+																	<a href=""><span class = "glyphicon glyphicon-pencil" style= "font-size:14px;padding-right:3px;"></span>添加注释</a>
+																	<textarea class="form-control" ng-model="task.text"></textarea>
+																	<div class="task-note-add-btn btn btn-primary" ng-click = "taskclickNote(task,blocks[$index])">发表</div>
+																</div>
+																<div class="task-note-list" ng-repeat = "n in task.note.notes">
+																		<h3>{{n.time}}</h3>
+																		<p>{{n.text}}</p>
+																		<span title= "删除" class="task-note-list-icon glyphicon glyphicon-remove" ng-click="deletenote(n)"></span>
+																</div>
+															</div>
+															<p><pre>{{task.content}}</pre></p>
+															<p ng-if="task.tip.length"><span style="padding-right:5px;">TIP:</span>{{task.tip}}</p>
+                                                            <div class="projectbrief-content-img clearfix" style="margin-top:12px">
+	                                                            <img ng-repeat = "shot in task.contentpics" style="margin:5px 10px; cursor:pointer;width: 100px;height: 100px;overflow: hidden;background: #fff;border: 1px solid rgba(255,255,255,0.25);border-radius: 4px;" ng-src={{shot.url}} href={{shot.url}} title={{shot.file}}  ng-click='$root.setGalleryPop($event)' >
+                                                                <!-- <ul>
+                                                                    <li ng-repeat = "shot in task.contentpics" style="cursor:pointer">
+                                                                        <div class="projectbrief-content-shots" ng-click='$root.setPicPop($event)' href='{{shot.url}}' style="background:#fff url({{shot.url}});background-size:cover;">
+                                                                        </div>
+                                                                    </li>
+                                                                </ul> -->
+                                                            </div>
+															<span class = "about-task-icon" ng-class = "(task.mstasksstate==5)?'glyphicon glyphicon-ok-circle':'glyphicon glyphicon-remove-circle'" ng-click = "clicktaskState(task,blocks[$index])" oid='task.tid' ></span>
+															<i btnshow title ="添加注释" class = "about-task-note glyphicon glyphicon-tags"></i>
+															<i class="about-task-note-length">{{task.note.count}}</i>
+														</dd>
+													</dl>
+												</div>
+											</div>
+											<!-- 收起页结束 -->
+										</div>
+									</li>
+								</ul>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- 右侧 -->
+			<div class="page-content-right mh5 clearfix" id="page-content-right">
+				<div class="r-page">
+					<!-- <div ng-include = "'/jieminuo/web/mis/Demo/_ngviews/chatroom/chatroom/chatroom.html'"></div> -->
+					<div ng-include = "'../../_pages/chatroom/chatroom.html'"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- 底部 -->
+<footer>
+	<!-- baseBotUrl -->
+    <div id='baseBotUrl' ng-include="'../../_controllers/base/baseBot.html'"></div>
+    <div id="toastUrl" ng-include = "$root.toastUrl"></div>
+    <div id="popUrl" ng-include = "$root.popUrl"></div>
+</footer>
+<script>
+var app = angular.module('app', ["myApp"]);
+gem.initApp(app);
+</script>
+</body>
+</html>
