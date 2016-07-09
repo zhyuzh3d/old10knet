@@ -1,0 +1,50 @@
+<!--统计报表页面框架-->
+
+<!--需要的js或css库文件-->
+
+<!--控制器界面部分-->
+<div id='pageReport' ng-controller='pageReport' class='container-fluid'>
+
+    <!--补充的css样式，都以控制器开头-->
+    <style>
+        .pageTask-temp {
+            font-weight: bold;
+        }
+    </style>
+
+    <!--html界面-->
+    <div ng-bind='txt'>Hello pageReport.</div>
+
+</div>
+
+
+<!--控制器代码部分-->
+<script>
+    (function() {
+        angular.module('app').controller('pageReport', ['$rootScope', '$scope', fn]);
+
+        function fn($rootScope, $scope) {
+             $rootScope['pageReport'] = $scope;
+
+            //载入外部依赖
+            _cfg.load('swal');
+            _cfg.load('toastr');
+
+            //切换页面
+            $scope.txt = 'Hello pageReport!';
+
+        };
+
+    })();
+</script>
+
+
+
+
+
+
+
+
+
+
+<!---->

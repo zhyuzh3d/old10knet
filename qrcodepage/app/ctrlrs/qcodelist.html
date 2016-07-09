@@ -1,0 +1,67 @@
+<!--二维码列表的页面框架-->
+
+<div id='qcodelist' ng-controller='qcodelist' class='container-fluid'>
+  <!--补充的css样式，都以控制器开头-->
+  <style>
+    .qcodelist-temp {
+      font-weight: bold;
+    }
+
+    .list-group li {
+      font-size: 12px;
+      height: 40px;
+      padding: 5px
+    }
+  </style>
+
+  <!--控制器html界面部分-->
+  <div class='col-xs-12 col-sm-12 col-md-10 col-lg-8 col-md-offset-1 col-lg-offset-2'>
+
+    <!--    按钮-->
+    <div class="btn btn-success" ng-click='addqcode()'>添加二维码</div>
+
+    <!--    二维码列表-->
+    <div style="margin-top:15px">
+      <div class="panel panel-default" ng-repeat='qcode in qcodes' style="margin-top:12px;margin-bottom:12px">
+
+        <!--        商场标题-->
+        <div class="panel-heading" style="height:40px">
+          <div class='col-xs-10' ng-bind='qcode.name'>未命名二维码</div>
+          <div class="col-xs-2" style=" text-align:right;cursor:pointer">
+            <span class="fa fa-remove" ng-click='removeqcode(qcode.key)'></span>
+          </div>
+        </div>
+
+        <ul class="list-group">
+          <li class="list-group-item">
+            <span class="btn btn-primary btn-sm" ng-click='setpkey(qcode.key)' style="margin:0 1em 0 1em">设置页面值</span>
+            <span ng-bind='qcode.pkey'></span>
+          </li>
+          <li class="list-group-item">
+            <span class="btn btn-warning btn-sm" ng-click='showqcode(qcode.key)' data-toggle="modal" data-target="#qcodelist_modal" style="margin:0 1em 0 1em">显示二维码</span>
+            <span ng-bind='qcode.key'></span>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!--    二维码弹窗-->
+    <div id='qcodelist_modal' class="modal fade bs-example-modal-sm" role="dialog" aria-labelledby="myLargeModalLabel">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content" style="text-align:center;padding:2em">
+          <div ng-bind='curqkey'>当前key</div>
+          <br>
+          <div id='curqcodediv'></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!--  end-->
+</div>
+
+<!--加载外部控制器js文件-->
+<script>
+  $.addCtrlrJs('qcodelist');
+</script>

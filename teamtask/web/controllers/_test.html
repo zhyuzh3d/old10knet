@@ -1,0 +1,63 @@
+<!--顶部导航栏-->
+
+<!--控制器界面部分-->
+<div id='_test' ng-controller='_test' class='container-fluid' style="margin:2em">
+
+    <!--补充的css样式，都以控制器开头-->
+    <style>
+    </style>
+
+
+    <div>
+        <!--        <input id="qnfile" name="file" class="ipt" type="file" />-->
+        <!--        <div id="btn_upload" class='btn btn-primary' ng-click='sendqn()'>提交</div>-->
+    </div>
+
+    <br>
+    <br>
+    <div>
+        <!--        <div class='btn btn-default' ng-click='showeditor($event)'>显示编辑器</div>-->
+        <!--        <textarea id='ta'>显示编辑器</textarea>-->
+    </div>
+
+    <br>
+
+    <div class="btn btn-default" ng-click='activebtn()'>ACT</div>
+    <br>
+    <div id="container">
+        <a class="btn btn-default btn-lg " id="pickfiles" href="#" ng-click='uploadfile($event)'>选择文件</a>
+    </div>
+    <div style="border:1px solid #AAA;padding:1em">
+        <div ng-repeat='f in files' class="panel panel-default" style="padding:1em">
+            <div>
+                <span ng-class='f.faicon'></span>
+                <span ng-bind='f.name'></span>
+                <span class='fa fa-remove' ng-click='remove(f)'></span>
+            </div>
+            <div style={{"width:"+f.percent+"%;height:5px;background:#0F5"}}>
+            </div>
+        </div>
+    </div>
+
+    <br>
+
+    <div id="drop" style="width:400px;height:200px;background:#EEE"></div>
+
+</div>
+
+
+<!--加载外部控制器js文件-->
+<script>
+    _fns.addCtrlrJs('_test');
+</script>
+
+
+
+
+
+
+
+
+
+
+<!---->
