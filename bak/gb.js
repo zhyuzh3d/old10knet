@@ -1,3 +1,102 @@
+/最基本的上传按钮
+    _fns.uploadFile = function (evt, callback) {
+        var btnjo = $(evt.target);
+
+        //创建formdata数据
+        var filejo = btnjo.siblings('#uploadFileInput');
+        filejo.remove();
+        filejo = $('<input id="uploadFileInput" type="file"></input>').appendTo(btnjo);
+        btnjo.after(filejo);
+
+        filejo.click();
+
+        //给file input添加监听
+        filejo.onchange = function () {
+            $.get('http://www.10knet.com/api/getUploadToken', function (res) {
+                var fdata = new FormData();
+                fdata.append('file', filejo);
+                $.get('http://www.10knet.com/api/getUploadToken', function (res) {
+
+            //准备上传
+            var xhr = new XMLHttpRequest();
+            fdata.append('token', res.uptoken);
+            xhr.open('POST', "http://up.qiniu.com", true);
+
+            //监听进度
+            var taking;
+            var startDate = new Date().getTime();
+
+            xhr.upload.addEventListener("load", function (evt) {
+                console.log('>>>>>loaded', evt);
+            });
+
+            xhr.upload.addEventListener("progress", function (evt) {
+
+                if (evt.lengthComputable) {
+                    var percentComplete = evt.loaded / evt.total;
+                    console.log('>>>>loading', percentComplete);
+                };
+
+
+
+
+
+
+                /*
+                if (evt.lengthComputable) {
+                    var nowDate = new Date().getTime();
+                    taking = nowDate - startDate;
+                    var x = (evt.loaded) / 1024;
+                    var y = taking / 1000;
+                    var uploadSpeed = (x / y);
+                    var formatSpeed;
+                    if (uploadSpeed > 1024) {
+                        formatSpeed = (uploadSpeed / 1024).toFixed(2) + "Mb\/s";
+                    } else {
+                        formatSpeed = uploadSpeed.toFixed(2) + "Kb\/s";
+                    }
+                    var percentComplete = Math.round(evt.loaded * 100 / evt.total);
+                    console && console.log(percentComplete, ",", formatSpeed);
+                }*/
+            }, false);
+
+
+            //启动上传
+            xhr.send(fdata);
+
+            if (callback) callback(xhr);
+        });
+
+
+
+            });
+        };
+
+
+        //获取token
+
+    };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /*global plupload */
 /*global qiniu */
 function FileProgress(file, targetID) {

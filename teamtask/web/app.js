@@ -176,8 +176,8 @@ var _xdat = {}; //共享变量
 
     //显示为html样式
     _app.filter('toTrustHtml', ['$sce',
-        function($sce) {
-            return function(text) {
+        function ($sce) {
+            return function (text) {
                 return $sce.trustAsHtml(text);
             }
         }
@@ -189,7 +189,7 @@ var _xdat = {}; //共享变量
 
     /*获取地址栏参数
      */
-    _fns.getUrlParam = function(name) {
+    _fns.getUrlParam = function (name) {
         var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
         var r = window.location.search.substr(1).match(reg);
         if (r != null) return unescape(r[2]);
@@ -198,7 +198,7 @@ var _xdat = {}; //共享变量
 
     /*获取根目录相对于当前页面的相对地址
      */
-    _fns.getRelUrl = function(fname) {
+    _fns.getRelUrl = function (fname) {
         var res = _cfg.homePath + fname;
 
         //获取当前页面地址，转换为根目录地址
@@ -212,14 +212,14 @@ var _xdat = {}; //共享变量
 
     /*获取路由页面，用于换页
      */
-    _fns.getCtrlr = function(ctrlrname) {
+    _fns.getCtrlr = function (ctrlrname) {
         var path = '/web/controllers/' + ctrlrname + '.html';
         var res = _fns.getRelUrl(path);
         return res;
     };
 
     /*自动载入控制器对应的js*/
-    _fns.addCtrlrJs = function(ctrlrname) {
+    _fns.addCtrlrJs = function (ctrlrname) {
         var all_js = document.getElementsByTagName("script");
         var cur_js = $(all_js[all_js.length - 1]);
         cur_js.prev().append('<script src="' + _fns.getRelUrl('/web/controllers/' + ctrlrname + '.js') + '"><\/script>');
@@ -227,7 +227,7 @@ var _xdat = {}; //共享变量
 
     /*向head添加需要初始化的库，参照_cfg.libs
      */
-    _fns.addLib = function(libstr) {
+    _fns.addLib = function (libstr) {
         var lib = _cfg.libs[libstr];
         if (libstr && lib && !lib.loaded) {
             for (var attr in lib) {
@@ -260,7 +260,7 @@ var _xdat = {}; //共享变量
 
     /*重新应用scope
      */
-    _fns.applyScope = function(scp) {
+    _fns.applyScope = function (scp) {
         if (scp && scp.$root && scp.$root.$$phase != '$apply' && scp.$root.$$phase != '$digest') {
             scp.$apply();
         };
@@ -280,7 +280,7 @@ var _xdat = {}; //共享变量
     需要具有scope.ctrlrName属性
     写入到$scope.args
      */
-    _fns.getCtrlrAgs = function(scope, element) {
+    _fns.getCtrlrAgs = function (scope, element) {
         var res;
         if (scope) {
             if (!scope.args) scope.args = {};
@@ -307,7 +307,7 @@ var _xdat = {}; //共享变量
 
     /*七牛上传函数
      */
-    _fns.setUploaderBtn = function(types, btnId, handlerFns, containerId, dropId) {
+    _fns.setUploaderBtn = function (types, btnId, handlerFns, containerId, dropId) {
 
         var opt = {
             runtimes: 'html5,html4',
@@ -321,23 +321,23 @@ var _xdat = {}; //共享变量
             chunk_size: '4mb',
             auto_start: true,
             x_vars: {
-                'time': function(up, file) {
+                'time': function (up, file) {
                     return file.name;
                 },
             },
             init: {
-                'FilesAdded': function(up, files) {
-                    plupload.each(files, function(file) {
+                'FilesAdded': function (up, files) {
+                    plupload.each(files, function (file) {
                         // 文件添加进队列后，处理相关的事情
                     });
                 },
-                'BeforeUpload': function(up, file) {
+                'BeforeUpload': function (up, file) {
                     // 每个文件上传前，处理相关的事情
                 },
-                'UploadProgress': function(up, file) {
+                'UploadProgress': function (up, file) {
                     // 每个文件上传时，处理相关的事情
                 },
-                'FileUploaded': function(up, file, info) {
+                'FileUploaded': function (up, file, info) {
                     // 每个文件上传成功后，处理相关的事情
                     // 其中info是文件上传成功后，服务端返回的json，形式如：
                     // {
@@ -349,13 +349,13 @@ var _xdat = {}; //共享变量
                     // var res = parseJSON(info);
                     // var sourceLink = domain + res.key; 获取上传成功后的文件的Url
                 },
-                'Error': function(up, err, errTip) {
+                'Error': function (up, err, errTip) {
                     //上传出错时，处理相关的事情
                 },
-                'UploadComplete': function() {
+                'UploadComplete': function () {
                     //队列文件处理完毕后，处理相关的事情
                 },
-                'Key': function(up, file) {
+                'Key': function (up, file) {
                     // 若想在前端对每个文件的key进行个性化处理，可以配置该函数
                     // 该配置必须要在unique_names: false，save_key: false时才生效
 
@@ -392,7 +392,7 @@ var _xdat = {}; //共享变量
 
 
     //最基本的上传按钮
-    _fns.uploadFile = function(evt, callback) {
+    _fns.uploadFile = function (evt, callback) {
         var btnjo = $(evt.target);
 
         //创建formdata数据
@@ -400,48 +400,83 @@ var _xdat = {}; //共享变量
         filejo.remove();
         filejo = $('<input id="uploadFileInput" type="file"></input>').appendTo(btnjo);
         btnjo.after(filejo);
-        var fdata = new FormData();
-        fdata.append('file', filejo);
 
-        filejo.click();
 
-        //获取token
-        var zhege = this;
-        $.get('http://www.10knet.com/api/getUploadToken', function(res) {
 
-            //准备上传
-            var xhr = new XMLHttpRequest();
-            fdata.append('token', res.uptoken);
-            xhr.open('POST', "http://up.qiniu.com", true);
+        //给file input添加监听
+        filejo.bind('change', function () {
+            var fileobj = filejo.get(0).files[0];
+            console.log('>>>onchange', fileobj);
 
-            //监听进度
-            var taking;
-            var startDate = new Date().getTime();
-            xhr.upload.addEventListener("progress", function(evt) {
-                if (evt.lengthComputable) {
-                    var nowDate = new Date().getTime();
-                    taking = nowDate - startDate;
-                    var x = (evt.loaded) / 1024;
-                    var y = taking / 1000;
-                    var uploadSpeed = (x / y);
-                    var formatSpeed;
-                    if (uploadSpeed > 1024) {
-                        formatSpeed = (uploadSpeed / 1024).toFixed(2) + "Mb\/s";
-                    } else {
-                        formatSpeed = uploadSpeed.toFixed(2) + "Kb\/s";
-                    }
-                    var percentComplete = Math.round(evt.loaded * 100 / evt.total);
-                    console && console.log(percentComplete, ",", formatSpeed);
-                }
-            }, false);
-
-            //启动上传
-            xhr.send(fdata);
-
-            if (callback) callback(xhr);
-            console.log('------fdata', fdata);
+            $.get('http://www.10knet.com/api/getUploadToken',
+                function (res) {
+                    _fns.uploadFileQn(fileobj, res.uptoken,
+                        function (evt) {
+                            console.log('>>>>loading....', evt);
+                            if (evt.lengthComputable) {
+                                var percentComplete = evt.loaded / evt.total;
+                                console.log('>>>>loading', percentComplete);
+                            };
+                        },
+                        function (res) {
+                            console.log('>>>>loadok', res);
+                        },
+                        function (err) {
+                            console.log('>>>>loaderr', res);
+                        });
+                });
         });
 
+        //激活
+        filejo.click();
+    };
+
+
+    /*上传到七牛存储的函数
+    ingfn(evt)传输中的函数,okfn(evt)完成后的函数
+    */
+    _fns.uploadFileQn = function (fileobj, token, ingfn, okfn, errfn) {
+        //准备fromdata
+        var fdata = new FormData();
+        fdata.append('file', fileobj);
+        fdata.append('token', token);
+
+        //发起上传
+        var set = {
+            url: "http://up.qiniu.com",
+            data: fdata,
+            type: 'POST',
+            processData: false,
+            contentType: false,
+            xhr: function () {
+                var xhr = $.ajaxSettings.xhr();
+                xhr.upload.addEventListener("progress", function (e) {
+                    console.log('proc', e);
+                }, false);
+                return xhr;
+            },
+            progress: function (e) {
+                console.log('>>>>progressXX', e);
+                if (!e.lengthComputable) {
+                    return;
+                }
+            },
+            success: function (result) {
+                //把七牛的返回结果专为标准格式
+                result['success'] = true;
+                result['file_path'] = 'http://pubfiles.10knet.com/' + result.key;
+                result['msg'] = 'upload ok.';
+                console.log('>>>>uploadok', result);
+            }
+        };
+
+        /*
+        if (ingfn) set.progress = ingfn;
+        if (okfn) set.success = okfn;
+        if (errfn) set.error = errfn;
+        */
+
+        return $.ajax(set);
     };
 
 
@@ -458,7 +493,7 @@ var _xdat = {}; //共享变量
         'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': 'fa fa-file-excel-o',
         'application/vnd.openxmlformats-officedocument.presentationml.presentation': 'fa fa-file-excel-o',
     };
-    _fns.getFileIcon = function(typestr, size) {
+    _fns.getFileIcon = function (typestr, size) {
         var res = _cfg.fileIcons[typestr] || 'fa fa-file-o';
         res = 'fa ' + res;
         if (size) res += ' ' + size;
