@@ -1,0 +1,12 @@
+<div class='row'>
+    <div id='uploadFilesList' style="margin-top:0.5em">
+        <div ng-repeat='xhr in reqs' class='panel panel-default' ng-repeat='xhr in xhrs' style="padding:1em;height:50px;position:relative;overflow:hidden;margin-bottom:0.2em">
+            <div style={{'background:#1ec38a;opacity:0.25;position:absolute;height:50px;margin:-14px;width:'+xhr.file.percent+'%'}} ng-show='xhr.file.percent<100'></div>
+            <a class="col-xs-10 elips" ng-bind='xhr.file.percent' ng-href='{{xhr.file.url}}'></a>
+            <div class="col-xs-2" style="text-align:right">
+                <span class='fa fa-remove' ng-click='removeFile(xhr.id)' style="cursor:pointer"></span>
+            </div>
+        </div>
+    </div>
+    <div id='uploadBtn' class='btn btn-default' ng-click='uploadFile($event)' style="margin-top:0.2em">上传文件</div>
+</div>

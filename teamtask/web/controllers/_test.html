@@ -14,10 +14,13 @@
     </div>
 
     <br>
+
+    <file-uploader   cb='cc'></file-uploader>
+    <div class="btn btn-default" ng-click='showxhrs()'>测试</div>
     <br>
     <div>
-                <div class='btn btn-default' ng-click='showeditor($event)'>显示编辑器</div>
-                <textarea id='ta'>显示编辑器</textarea>
+        <div class='btn btn-default' ng-click='showeditor($event)'>显示编辑器</div>
+        <textarea id='ta'>显示编辑器</textarea>
     </div>
 
     <br>
@@ -26,6 +29,7 @@
     <br>
     <div id="container">
         <a class="btn btn-default btn-lg " id="pickfiles" href="#" ng-click='uploadfile($event)'>选择文件</a>
+        <a class="btn btn-default btn-lg " id="pickfiles" href="#" ng-click='cancel(upid)'>取消</a>
     </div>
     <div style="border:1px solid #AAA;padding:1em">
         <div ng-repeat='f in files' class="panel panel-default" style="padding:1em">
@@ -48,6 +52,7 @@
 
 <!--加载外部控制器js文件-->
 <script>
+    _fns.addDrctvJs('fileUploader');
     _fns.addCtrlrJs('_test');
 </script>
 

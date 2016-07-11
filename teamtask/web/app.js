@@ -10,6 +10,7 @@ var _xdat = {}; //共享变量
 (function _main() {
     'use strict';
 
+
     _cfg.host = window.location.host;
     _cfg.homePath = 'teamtask';
 
@@ -57,6 +58,59 @@ var _xdat = {}; //共享变量
             }
         }
     }
+
+
+
+    /*重新封装console的函数*/
+    var cnslPreStr = '>';
+    console.xerr = function() {
+        var args = arguments;
+        console.info(cnslPreStr, 'ERR:');
+        console.error.apply(this, args);
+    };
+    console.xlog = function() {
+        var args = arguments;
+        console.info(cnslPreStr, 'LOG:');
+        console.log.apply(this, args);
+    };
+    console.xinfo = function() {
+        var args = arguments;
+        console.info(cnslPreStr, 'INFO:');
+        console.info.apply(this, args);
+    };
+    console.xwarn = function() {
+        var args = arguments;
+        console.info(cnslPreStr, 'WARN:');
+        console.xwarn.apply(this, args);
+    };
+
+
+    /*专用err处理函数,适合co().then()使用*/
+    __errhdlr = __errhdlr;
+
+    function __errhdlr(err) {
+        console.xerr(err.stack);
+    };
+
+    /*专用空函数，只输出不做额外处理,适合co().then()使用*/
+    __nullhdlr = __nullhdlr;
+
+    function __nullhdlr(res) {};
+
+    /*专用空函数，只输出不做额外处理,适合co().then()使用*/
+    __infohdlr = __infohdlr;
+
+    function __infohdlr(res) {
+        console.xinfo(res);
+    };
+
+    /*专用空函数，只纪录日志不做额外处理,适合co().then()使用*/
+    __loghdlr = __loghdlr;
+
+    function __loghdlr(res) {
+        console.xlog(res);
+    };
+
 
 
     //任务的状态
@@ -176,8 +230,8 @@ var _xdat = {}; //共享变量
 
     //显示为html样式
     _app.filter('toTrustHtml', ['$sce',
-        function ($sce) {
-            return function (text) {
+        function($sce) {
+            return function(text) {
                 return $sce.trustAsHtml(text);
             }
         }
@@ -189,7 +243,7 @@ var _xdat = {}; //共享变量
 
     /*获取地址栏参数
      */
-    _fns.getUrlParam = function (name) {
+    _fns.getUrlParam = function(name) {
         var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
         var r = window.location.search.substr(1).match(reg);
         if (r != null) return unescape(r[2]);
@@ -198,7 +252,7 @@ var _xdat = {}; //共享变量
 
     /*获取根目录相对于当前页面的相对地址
      */
-    _fns.getRelUrl = function (fname) {
+    _fns.getRelUrl = function(fname) {
         var res = _cfg.homePath + fname;
 
         //获取当前页面地址，转换为根目录地址
@@ -212,22 +266,46 @@ var _xdat = {}; //共享变量
 
     /*获取路由页面，用于换页
      */
-    _fns.getCtrlr = function (ctrlrname) {
+    _fns.getCtrlr = function(ctrlrname) {
         var path = '/web/controllers/' + ctrlrname + '.html';
         var res = _fns.getRelUrl(path);
         return res;
     };
 
+    /*获取指令页面，用于元素使用
+     */
+    _fns.getDrctv = function(drctvname) {
+        var path = '/web/directives/' + drctvname + '.js';
+        var res = _fns.getRelUrl(path);
+        return res;
+    };
+
+    /*获取指令页面，用于元素使用
+     */
+    _fns.getDrctvTmp = function(drctvname) {
+        var path = '/web/directives/' + drctvname + '.html';
+        var res = _fns.getRelUrl(path);
+        return res;
+    };
+
+
     /*自动载入控制器对应的js*/
-    _fns.addCtrlrJs = function (ctrlrname) {
+    _fns.addCtrlrJs = function(ctrlrname) {
         var all_js = document.getElementsByTagName("script");
         var cur_js = $(all_js[all_js.length - 1]);
         cur_js.prev().append('<script src="' + _fns.getRelUrl('/web/controllers/' + ctrlrname + '.js') + '"><\/script>');
     };
 
+    /*自动载入指令对应的js*/
+    _fns.addDrctvJs = function(drctvname) {
+        var all_js = document.getElementsByTagName("script");
+        var cur_js = $(all_js[all_js.length - 1]);
+        cur_js.prev().append('<script src="' + _fns.getRelUrl('/web/directives/' + drctvname + '.js') + '"><\/script>');
+    };
+
     /*向head添加需要初始化的库，参照_cfg.libs
      */
-    _fns.addLib = function (libstr) {
+    _fns.addLib = function(libstr) {
         var lib = _cfg.libs[libstr];
         if (libstr && lib && !lib.loaded) {
             for (var attr in lib) {
@@ -260,7 +338,7 @@ var _xdat = {}; //共享变量
 
     /*重新应用scope
      */
-    _fns.applyScope = function (scp) {
+    _fns.applyScope = function(scp) {
         if (scp && scp.$root && scp.$root.$$phase != '$apply' && scp.$root.$$phase != '$digest') {
             scp.$apply();
         };
@@ -280,7 +358,7 @@ var _xdat = {}; //共享变量
     需要具有scope.ctrlrName属性
     写入到$scope.args
      */
-    _fns.getCtrlrAgs = function (scope, element) {
+    _fns.getCtrlrAgs = function(scope, element) {
         var res;
         if (scope) {
             if (!scope.args) scope.args = {};
@@ -307,7 +385,7 @@ var _xdat = {}; //共享变量
 
     /*七牛上传函数
      */
-    _fns.setUploaderBtn = function (types, btnId, handlerFns, containerId, dropId) {
+    _fns.setUploaderBtn = function(types, btnId, handlerFns, containerId, dropId) {
 
         var opt = {
             runtimes: 'html5,html4',
@@ -321,23 +399,23 @@ var _xdat = {}; //共享变量
             chunk_size: '4mb',
             auto_start: true,
             x_vars: {
-                'time': function (up, file) {
+                'time': function(up, file) {
                     return file.name;
                 },
             },
             init: {
-                'FilesAdded': function (up, files) {
-                    plupload.each(files, function (file) {
+                'FilesAdded': function(up, files) {
+                    plupload.each(files, function(file) {
                         // 文件添加进队列后，处理相关的事情
                     });
                 },
-                'BeforeUpload': function (up, file) {
+                'BeforeUpload': function(up, file) {
                     // 每个文件上传前，处理相关的事情
                 },
-                'UploadProgress': function (up, file) {
+                'UploadProgress': function(up, file) {
                     // 每个文件上传时，处理相关的事情
                 },
-                'FileUploaded': function (up, file, info) {
+                'FileUploaded': function(up, file, info) {
                     // 每个文件上传成功后，处理相关的事情
                     // 其中info是文件上传成功后，服务端返回的json，形式如：
                     // {
@@ -349,13 +427,13 @@ var _xdat = {}; //共享变量
                     // var res = parseJSON(info);
                     // var sourceLink = domain + res.key; 获取上传成功后的文件的Url
                 },
-                'Error': function (up, err, errTip) {
+                'Error': function(up, err, errTip) {
                     //上传出错时，处理相关的事情
                 },
-                'UploadComplete': function () {
+                'UploadComplete': function() {
                     //队列文件处理完毕后，处理相关的事情
                 },
-                'Key': function (up, file) {
+                'Key': function(up, file) {
                     // 若想在前端对每个文件的key进行个性化处理，可以配置该函数
                     // 该配置必须要在unique_names: false，save_key: false时才生效
 
@@ -391,92 +469,226 @@ var _xdat = {}; //共享变量
     };
 
 
-    //最基本的上传按钮
-    _fns.uploadFile = function (evt, callback) {
-        var btnjo = $(evt.target);
-
-        //创建formdata数据
-        var filejo = btnjo.siblings('#uploadFileInput');
-        filejo.remove();
-        filejo = $('<input id="uploadFileInput" type="file"></input>').appendTo(btnjo);
-        btnjo.after(filejo);
-
-
-
-        //给file input添加监听
-        filejo.bind('change', function () {
-            var fileobj = filejo.get(0).files[0];
-            console.log('>>>onchange', fileobj);
-
-            $.get('http://www.10knet.com/api/getUploadToken',
-                function (res) {
-                    _fns.uploadFileQn(fileobj, res.uptoken,
-                        function (evt) {
-                            console.log('>>>>loading....', evt);
-                            if (evt.lengthComputable) {
-                                var percentComplete = evt.loaded / evt.total;
-                                console.log('>>>>loading', percentComplete);
-                            };
-                        },
-                        function (res) {
-                            console.log('>>>>loadok', res);
-                        },
-                        function (err) {
-                            console.log('>>>>loaderr', res);
-                        });
-                });
-        });
-
-        //激活
-        filejo.click();
+    /*简单的随机uniqueid，随机加时间戳
+     */
+    _fns.uuid = function(strong) {
+        var str1 = (new Date()).getTime().toString(32);
+        if (!strong) strong = 1;
+        var str2 = '';
+        for (var i = 0; i < strong; i++) {
+            str2 += (Math.random()).toString(32).substr(2);
+        };
+        return (str2 + str1).toUpperCase();
     };
 
 
-    /*上传到七牛存储的函数
-    ingfn(evt)传输中的函数,okfn(evt)完成后的函数
+    /*最基本的上传按钮
+    progress(evt),//添加evt.percent
+    successfn(res),//增加res.url
+    返回一个uniqID，最终的xhr存储在_cfg.xhrs[uploadid][xhrid]，用于取消上传
     */
-    _fns.uploadFileQn = function (fileobj, token, ingfn, okfn, errfn) {
+    _cfg.xhrs = {};
+
+    /**
+     * [[上传一个或多个文件]]
+     * @param   {[[jquery对象]]} btnjo      [[*按钮]]
+     * @param   {[[function]]} beforefn [[在发起上传之前执行的函数,fn(f,xhr)]]
+     * @param   {[[function]]} progressfn [[上传过程中的函数，fn(f,evt),上传百分比进度evt.percent]]
+     * @param   {[[function]]} successfn  [[上传成功后执行的函数，fn(f,res)，上传的文件地址res.url]]
+     * @param   {[[function]]} abortfn    [[取消上传后执行的函数]]
+     * @param   {[[function]]} errorfn    [[出错执行的函数,fn(f,err)，标准xhr参数]]
+     * @param   {[[function]]} completefn [[上传完成执行的函数,fn(f,xhr,status),标准xhr参数]]
+     * @param   {[[string]]} domain     [[上传到指定的bucket，默认http://pubfiles.10knet.com/]]
+     * @param   {[[boolean]]} multi     [[同时上传多个文件]]
+     * @returns {[[int]]} [[uploadId整数，指向一个数组包含所有文件的xhr，数组存放在_cfg.xhrs[uploadId]]]
+     */
+    _fns.uploadFile = function(btnjo, beforefn, progressfn, successfn, abortfn, errorfn, completefn, domain, multi) {
+        if (!btnjo) {
+            __errhdlr(new Error('_fns.uploadFile:button undefined.'));
+            return;
+        };
+
+        //如果按钮已经有uploadid，那么直接使用，否则就重新创建
+        var uploadId = btnjo.attr('uploadId') || _fns.uuid();
+        btnjo.attr('uploadId', uploadId);
+        if (!_cfg.xhrs[uploadId]) _cfg.xhrs[uploadId] = {};
+
+        //创建file数据,隐身input放在btn之后
+        var filejo = btnjo.siblings('#uploadFileInput');
+        filejo.remove();
+        filejo = $('<input id="uploadFileInput" type="file" style="display:none"></input>').appendTo(btnjo);
+        if (multi) filejo.attr('multiple', "multiple");
+        btnjo.after(filejo);
+
+
+        //给file input添加监听
+        filejo.bind('change', function() {
+            var fileobjs = filejo.get(0).files;
+            if (!domain) domain = 'http://pubfiles.10knet.com/';
+
+            $.get('http://www.10knet.com/api/getUploadToken',
+                function(res) {
+                    for (var i = 0; i < fileobjs.length; i++) {
+                        var f = fileobjs[i];
+
+                        //执行上传之前的动作,预先放置一个空的xhr，带有file信息
+                        var xhrid = _fns.uuid();
+                        var xhr = {};
+                        xhr.id = xhrid;
+                        xhr.file = f;
+                        _cfg.xhrs[uploadId][xhrid] = xhr;
+                        if (beforefn) beforefn(f, xhr);
+
+
+                        //开始上传
+                        xhr = _fns.uploadFileQn(res.uptoken, f,
+                            function(evt) {
+                                //添加evt.percent,为了避免abort之后progress会多运行一次，所以使用f.abort做判断
+                                if (progressfn && !f.abort) {
+                                    if (evt.lengthComputable) {
+                                        evt.percent = (100 * evt.loaded / evt.total).toFixed(0);
+                                        f.percent = evt.percent;
+                                    };
+                                    progressfn(f, evt);
+                                };
+                            },
+                            function(res) {
+                                //把七牛的返回结果转为标准格式
+                                res['success'] = true;
+                                f.url = res.url = res['file_path'] = domain + res.key;
+                                res['msg'] = 'upload ok.';
+                                if (successfn) successfn(f, res);
+                            },
+                            function(err) {
+                                if (errorfn) errorfn(f, err);
+                            },
+                            function(xhr, status) {
+                                filejo.remove();
+                                if (completefn) completefn(f, xhr, status);
+                            }, domain);
+
+                        if (xhr && abortfn) xhr['abortfn'] = abortfn;
+                        xhr.id = xhrid;
+                        if (xhr) _cfg.xhrs[uploadId][xhrid] = xhr;
+                    }
+                });
+
+        });
+
+        //激活按钮点击事件
+        filejo.click();
+
+        return uploadId;
+    };
+
+
+    /**
+     * [[上传多个文件，与uploadFile单个文件相同]]
+     */
+    _fns.uploadFiles = function(btnjo, beforefn, progressfn, successfn, abortfn, errorfn, completefn, domain) {
+        return _fns.uploadFile(btnjo, beforefn, progressfn, successfn, abortfn, errorfn, completefn, domain, true);
+    };
+
+
+    /**
+     * [[取消上传]]
+     * @param {[[int]]} xhrid [[最终xhr将存放在_cfg.xhrs[xhrid]]]
+     */
+    _fns.abortUpload = function(xhrid) {
+        swal({
+            title:'',
+            text: "删除后将无法恢复，确认删除吗？",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "是的，删除",
+            cancelButtonText: "取消",
+            closeOnConfirm: true,
+            html: false
+        }, function() {
+            for (var upid in _cfg.xhrs) {
+                var ups = _cfg.xhrs[upid];
+                for (var xid in ups) {
+                    var xhr = ups[xid];
+                    xhr.file.abort = true;
+                    xhr.abort();
+                    delete ups[xid];
+                    if (xhr.abortfn) xhr.abortfn();
+                }
+            };
+        })
+    };
+
+
+
+    /**
+     * [[上传到七牛存储的函数]]
+     * @param   {[[string]]} token    [[上传的密匙]]
+     * @param   {[[fileobj]]} file     [[文件对象inputjo.get(0).files[n]]]
+     * @param   {[[function]]} progress [[上传过程中的函数，fn(evt),上传百分比进度evt.percent]]
+     * @param   {[[function]]} success  [[上传成功后执行的函数，fn(res)，上传的文件地址res.url]]
+     * @param   {[[function]]} abort    [[取消上传后执行的函数]]
+     * @param   {[[function]]} error    [[出错执行的函数,fn(err)，标准xhr参数]]
+     * @param   {[[function]]} complete [[上传完成执行的函数,fn(xhr,status),标准xhr参数]]
+     * @param   {[[string]]} domain     [[上传到指定的bucket，默认http://pubfiles.10knet.com/]]
+     * @returns {[[xhr]]} [[xmlhttprequest对象]]
+     */
+    _fns.uploadFileQn = function(token, file, progress, success, error, complete, domain) {
+        var useargs = (token.constructor != String);
+
+        if (useargs) token = arguments.token;
+        if (!token) {
+            __errhdlr(new Error('_fns.uploadFileQn:token undefined.'))
+            return;
+        };
+
+        if (useargs) file = arguments.file;
+        if (!file) {
+            __errhdlr(new Error('_fns.uploadFileQn:file undefined.'))
+            return;
+        };
+
+        if (useargs) domain = arguments.domain || 'http://pubfiles.10knet.com/';
+
+
         //准备fromdata
-        var fdata = new FormData();
-        fdata.append('file', fileobj);
-        fdata.append('token', token);
+        var formdata = new FormData();
+        formdata.append('token', token);
+        formdata.append('file', file);
 
         //发起上传
         var set = {
             url: "http://up.qiniu.com",
-            data: fdata,
+            data: formdata,
             type: 'POST',
-            processData: false,
-            contentType: false,
-            xhr: function () {
-                var xhr = $.ajaxSettings.xhr();
-                xhr.upload.addEventListener("progress", function (e) {
-                    console.log('proc', e);
-                }, false);
-                return xhr;
-            },
-            progress: function (e) {
-                console.log('>>>>progressXX', e);
-                if (!e.lengthComputable) {
-                    return;
-                }
-            },
-            success: function (result) {
-                //把七牛的返回结果专为标准格式
-                result['success'] = true;
-                result['file_path'] = 'http://pubfiles.10knet.com/' + result.key;
-                result['msg'] = 'upload ok.';
-                console.log('>>>>uploadok', result);
-            }
+            processData: false, //屏蔽掉ajax自动header处理
+            contentType: false, //屏蔽掉ajax自动header处理
         };
 
-        /*
-        if (ingfn) set.progress = ingfn;
-        if (okfn) set.success = okfn;
-        if (errfn) set.error = errfn;
-        */
+        //监听事件
+        if (useargs) progress = arguments.progress;
+        if (progress) {
+            set.xhr = function() {
+                //为ajax添加progress事件监听
+                var xhr = $.ajaxSettings.xhr();
+                if (!xhr.file) xhr.file = file;
+                xhr.upload.addEventListener("progress", progress, false);
+                return xhr;
+            };
+        };
 
-        return $.ajax(set);
+        if (useargs) success = arguments.success;
+        if (success) set.success = success;
+        if (useargs) error = arguments.error;
+        if (error) set.error = error;
+        if (useargs) complete = arguments.complete;
+        if (complete) set.complete = complete;
+
+        var xhr = $.ajax(set);
+        xhr.file = file;
+        xhr.domain = domain;
+
+        return xhr;
     };
 
 
@@ -493,7 +705,7 @@ var _xdat = {}; //共享变量
         'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': 'fa fa-file-excel-o',
         'application/vnd.openxmlformats-officedocument.presentationml.presentation': 'fa fa-file-excel-o',
     };
-    _fns.getFileIcon = function (typestr, size) {
+    _fns.getFileIcon = function(typestr, size) {
         var res = _cfg.fileIcons[typestr] || 'fa fa-file-o';
         res = 'fa ' + res;
         if (size) res += ' ' + size;
@@ -524,6 +736,10 @@ var _xdat = {}; //共享变量
         };
         return res;
     };
+
+
+
+
 
 
 

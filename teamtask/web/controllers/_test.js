@@ -1,5 +1,6 @@
 //测试控制器
 (function() {
+
     angular.module('app').controller('_test', ['$rootScope', '$scope', '$element', fn]);
 
     function fn($rootScope, $scope, $element) {
@@ -18,6 +19,28 @@
         _fns.addLib('jform');
         _fns.addLib('plupload');
         _fns.addLib('qiniu');
+
+
+        $scope.showxhrs = function() {
+            if($scope.aa)console.log('show aa', $scope.aa)
+            if($scope.bb)console.log('show bb', $scope.bb.find('#uploadFilesList').html())
+            if($scope.cc)console.log('show cc', $scope.cc)
+        };
+
+
+        $scope.cc = function(f, res) {
+            console.log('------------------out cc', res, f);
+        }
+
+
+
+        var url = _fns.getDrctv('fileUploader');
+        console.log('>>>>>>>>>>>>>>', url);
+
+
+
+
+
 
         $scope.files = [];
         $scope.activebtn = function() {
@@ -46,13 +69,30 @@
             var n = $scope.files.indexOf(f);
             $scope.files.splice(n, 1);
             _fns.applyScope($scope);
-        }
+        };
 
 
 
+        $scope.uploadfile = function(evt) {
+            var btnjo = $(evt.target);
+            var btnlable = btnjo.html();
+            $scope.upid = _fns.uploadFile(btnjo, function(proevt) {
+                //progress
+                btnjo.html(proevt.percent + '%');
+                console.log('>>>>progress...')
+            }, function(res) {
+                //complete
+                btnjo.html(btnlable);
+                console.log('>>>>complete...', res)
+            }, function() {
+                console.log('>>>>abort', btnlable);
+            })[0];
+
+        };
 
 
-        $scope.uploadfile = _fns.uploadFile;
+
+        $scope.cancel = _fns.abortUpload;
 
 
 
